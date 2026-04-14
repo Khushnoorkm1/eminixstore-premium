@@ -81,6 +81,49 @@
         "createdAt": { "type": "string", "format": "date-time" }
       },
       "required": ["productId", "userId", "rating", "comment"]
+    },
+    "Category": {
+      "title": "Category",
+      "description": "Product category details",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "image": { "type": "string" },
+        "status": { "type": "string", "enum": ["Active", "Inactive"] },
+        "productsCount": { "type": "number" }
+      },
+      "required": ["name", "status"]
+    },
+    "Banner": {
+      "title": "Banner",
+      "description": "Homepage hero banners",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "subtitle": { "type": "string" },
+        "image": { "type": "string" },
+        "video": { "type": "string" },
+        "type": { "type": "string", "enum": ["image", "video"] },
+        "link": { "type": "string" },
+        "order": { "type": "number" },
+        "isActive": { "type": "boolean" }
+      },
+      "required": ["type", "order", "isActive"]
+    },
+    "Promotion": {
+      "title": "Promotion",
+      "description": "Coupon codes and promotional offers",
+      "type": "object",
+      "properties": {
+        "code": { "type": "string" },
+        "discount": { "type": "number" },
+        "type": { "type": "string", "enum": ["percentage", "fixed"] },
+        "expiry": { "type": "string", "format": "date" },
+        "usageCount": { "type": "number" },
+        "status": { "type": "string", "enum": ["Active", "Expired", "Inactive"] }
+      },
+      "required": ["code", "discount", "type", "status"]
     }
   },
   "firestore": {
@@ -107,6 +150,18 @@
     "/wishlists/{userId}": {
       "schema": "object",
       "description": "User wishlists"
+    },
+    "/categories/{categoryId}": {
+      "schema": "Category",
+      "description": "Product categories"
+    },
+    "/banners/{bannerId}": {
+      "schema": "Banner",
+      "description": "Hero banners"
+    },
+    "/promotions/{promoId}": {
+      "schema": "Promotion",
+      "description": "Promotional coupons"
     }
   }
 }

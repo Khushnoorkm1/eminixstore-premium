@@ -37,32 +37,20 @@ const sidebarItems = [
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  const { user, profile } = useAuth();
+  const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Protect admin routes
-  if (!profile || profile.role !== 'admin') {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-950 text-white p-4">
-        <div className="text-center space-y-6 max-w-md">
-          <div className="h-20 w-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto">
-            <X className="h-10 w-10 text-red-500" />
-          </div>
-          <h1 className="text-3xl font-bold tracking-tight">Access Denied</h1>
-          <p className="text-gray-400 font-light">You do not have permission to access the admin panel. Please contact the administrator if you believe this is an error.</p>
-          <button 
-            onClick={() => navigate('/')}
-            className="bg-teal-800 text-white px-8 py-3 rounded-full font-bold hover:bg-teal-900 transition-all"
-          >
-            Return to Store
-          </button>
-        </div>
-      </div>
-    );
-  }
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/admin/login');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#FAF9F6] dark:bg-gray-950 transition-colors duration-300 flex">
@@ -110,7 +98,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
           <div className="p-4 border-t border-gray-100 dark:border-gray-800">
             <button 
-              onClick={() => { logout(); navigate('/'); }}
+              onClick={handleLogout}
               className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-red-600 hover:bg-red-50 dark:hover:bg-red-900/10 transition-all`}
             >
               <LogOut className="h-5 w-5 flex-shrink-0" />

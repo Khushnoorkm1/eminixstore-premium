@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { SAMPLE_PRODUCTS } from '../data/products';
-import { Star, ShoppingCart, Heart, Share2, ShieldCheck, Truck, RotateCcw, ChevronRight, Minus, Plus, MessageSquare, Send, CheckCircle2, Award, Zap } from 'lucide-react';
+import { Star, ShoppingCart, Heart, Share2, ShieldCheck, Truck, RotateCcw, ChevronRight, Minus, Plus, MessageSquare, Send, CheckCircle2, Award, Zap, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 import ProductCard from '../components/ProductCard';
 import SEO from '../components/SEO';
 import { db } from '../lib/firebase';
@@ -25,11 +26,13 @@ export default function ProductDetail() {
   const navigate = useNavigate();
   const { addToCart } = useCart();
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState('description');
   const [reviews, setReviews] = useState<Review[]>([]);
   const [newReview, setNewReview] = useState({ rating: 5, comment: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isARModalOpen, setIsARModalOpen] = useState(false);
 
   const product = SAMPLE_PRODUCTS.find(p => p.id === id);
   const [mainImage, setMainImage] = useState(product?.image || '');
@@ -206,8 +209,8 @@ export default function ProductDetail() {
 
             {/* Actions */}
             <div className="space-y-6 mb-12">
-              <div className="flex items-center space-x-6">
-                <div className="flex items-center border border-gray-200 dark:border-gray-700 rounded-full px-4 py-2">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+                <div className="flex items-center border border-gray-200 dark:border-gray-700 rounded-full px-4 py-3 justify-between sm:justify-start">
                   <button 
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
                     className="p-1 hover:text-teal-800 dark:text-gray-400 transition-colors"
@@ -230,9 +233,20 @@ export default function ProductDetail() {
                   className="flex-1 bg-teal-800 text-white py-4 rounded-full font-bold hover:bg-teal-900 transition-all flex items-center justify-center space-x-2 shadow-lg shadow-teal-800/20"
                 >
                   <ShoppingCart className="h-5 w-5" />
-                  <span>Add to Cart</span>
+                  <span>{t('product.addToCart')}</span>
                 </button>
               </div>
+
+              {/* AR Try-On Button */}
+              {(product.category === 'Accessories' || product.category === 'Apparel' || product.category === 'Electronics') && (
+                <button 
+                  onClick={() => setIsARModalOpen(true)}
+                  className="w-full bg-white dark:bg-gray-900 border-2 border-gold-500 text-gold-500 py-4 rounded-full font-bold hover:bg-gold-500 hover:text-teal-900 transition-all flex items-center justify-center space-x-2 group"
+                >
+                  <Sparkles className="h-5 w-5 group-hover:animate-pulse" />
+                  <span>{t('product.tryOn')}</span>
+                </button>
+              )}
             </div>
 
             {/* Trust Badges */}
@@ -417,6 +431,83 @@ export default function ProductDetail() {
           </section>
         )}
       </div>
+
+      {/* AR Try-On Modal */}
+      <AnimatePresence>
+        {isARModalOpen && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsARModalOpen(false)}
+              className="absolute inset-0 bg-black/80 backdrop-blur-md"
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="relative bg-white dark:bg-gray-950 w-full max-w-4xl h-[80vh] rounded-[3rem] overflow-hidden shadow-2xl flex flex-col"
+            >
+              <div className="p-8 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">AR Virtual Try-On</h3>
+                  <p className="text-xs text-gold-500 font-bold uppercase tracking-widest mt-1">Eminix Vision Pro</p>
+                </div>
+                <button 
+                  onClick={() => setIsARModalOpen(false)}
+                  className="p-2 text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+                >
+                  <CheckCircle2 className="h-6 w-6" />
+                </button>
+              </div>
+              
+              <div className="flex-grow relative bg-gray-100 dark:bg-gray-900 flex flex-col items-center justify-center p-12 text-center">
+                <div className="max-w-md">
+                  <div className="bg-gold-500/10 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-8">
+                    <Sparkles className="h-12 w-12 text-gold-500" />
+                  </div>
+                  <h4 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">AR Experience Coming Soon</h4>
+                  <p className="text-gray-500 dark:text-gray-400 font-light leading-relaxed mb-8">
+                    We are currently refining our augmented reality experience to ensure it meets the Eminix standard of excellence. Soon you'll be able to see how this {product.name} looks in your space or on your person with perfect precision.
+                  </p>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="p-4 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700">
+                      <p className="text-[10px] font-bold text-gold-500 uppercase tracking-widest mb-1">Precision</p>
+                      <p className="text-sm font-bold text-gray-900 dark:text-white">99.9% Accuracy</p>
+                    </div>
+                    <div className="p-4 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700">
+                      <p className="text-[10px] font-bold text-gold-500 uppercase tracking-widest mb-1">Lighting</p>
+                      <p className="text-sm font-bold text-gray-900 dark:text-white">Real-time HDR</p>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Simulated Camera Feed Background */}
+                <div className="absolute inset-0 opacity-5 pointer-events-none overflow-hidden">
+                  <div className="w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-gold-500/20 via-transparent to-transparent animate-pulse" />
+                </div>
+              </div>
+
+              <div className="p-8 bg-teal-900 text-white flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <img src={product.image} alt="" className="h-12 w-12 rounded-xl object-cover border border-white/10" />
+                  <div>
+                    <p className="text-xs font-bold text-gold-500 uppercase tracking-widest">Selected Item</p>
+                    <p className="text-sm font-bold">{product.name}</p>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => setIsARModalOpen(false)}
+                  className="bg-gold-500 text-teal-900 px-8 py-3 rounded-full font-bold hover:bg-gold-400 transition-all"
+                >
+                  Notify Me
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

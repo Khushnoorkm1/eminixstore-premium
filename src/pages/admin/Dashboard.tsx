@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   TrendingUp, 
   ShoppingBag, 
@@ -7,7 +7,8 @@ import {
   ArrowUpRight, 
   ArrowDownRight,
   MoreVertical,
-  Calendar
+  Calendar,
+  Loader2
 } from 'lucide-react';
 import { 
   AreaChart, 
@@ -22,6 +23,9 @@ import {
   Cell
 } from 'recharts';
 import { motion } from 'motion/react';
+import { adminService } from '../../services/adminService';
+import { collection, getDocs, query, limit, orderBy } from 'firebase/firestore';
+import { db } from '../../lib/firebase';
 
 const salesData = [
   { name: 'Jan', sales: 4000, orders: 240 },
@@ -72,8 +76,63 @@ const StatCard = ({ title, value, change, icon: Icon, isPositive }: any) => (
 );
 
 export default function AdminDashboard() {
+  const [stats, setStats] = useState({
+    revenue: 0,
+    orders: 0,
+    customers: 0,
+    conversion: 3.42
+  });
+  const [recentOrders, setRecentOrders] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+
+  const fetchDashboardData = async () => {
+    setIsLoading(true);
+    try {
+      // Fetch total orders
+      const ordersSnapshot = await getDocs(collection(db, 'orders'));
+      const totalOrders = ordersSnapshot.size;
+      const totalRevenue = ordersSnapshot.docs.reduce((acc, doc) => acc + (doc.data().total || 0), 0);
+
+      // Fetch total customers
+      const customersSnapshot = await getDocs(collection(db, 'users'));
+      const totalCustomers = customersSnapshot.size;
+
+      // Fetch recent orders
+      const recentQ = query(collection(db, 'orders'), orderBy('createdAt', 'desc'), limit(5));
+      const recentSnapshot = await getDocs(recentQ);
+      const recentData = recentSnapshot.docs.map(doc => ({
+        id: doc.id,
+        customer: doc.data().customerName || 'Guest',
+        date: doc.data().createdAt?.toDate().toLocaleDateString() || 'N/A',
+        amount: doc.data().total || 0,
+        status: doc.data().status || 'Pending'
+      }));
+
+      setStats({
+        revenue: totalRevenue,
+        orders: totalOrders,
+        customers: totalCustomers,
+        conversion: 3.42
+      });
+      setRecentOrders(recentData);
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 relative">
+      {isLoading && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-white/20 dark:bg-gray-900/20 backdrop-blur-[2px]">
+          <Loader2 className="h-10 w-10 text-teal-800 animate-spin" />
+        </div>
+      )}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">Dashboard Overview</h1>
@@ -92,10 +151,10 @@ export default function AdminDashboard() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard title="Total Revenue" value="$128,430.00" change="12.5" icon={DollarSign} isPositive={true} />
-        <StatCard title="Total Orders" value="1,482" change="8.2" icon={ShoppingBag} isPositive={true} />
-        <StatCard title="Total Customers" value="8,291" change="3.1" icon={Users} isPositive={true} />
-        <StatCard title="Conversion Rate" value="3.42%" change="1.4" icon={TrendingUp} isPositive={false} />
+        <StatCard title="Total Revenue" value={`$${stats.revenue.toLocaleString()}`} change="12.5" icon={DollarSign} isPositive={true} />
+        <StatCard title="Total Orders" value={stats.orders.toLocaleString()} change="8.2" icon={ShoppingBag} isPositive={true} />
+        <StatCard title="Total Customers" value={stats.customers.toLocaleString()} change="3.1" icon={Users} isPositive={true} />
+        <StatCard title="Conversion Rate" value={`${stats.conversion}%`} change="1.4" icon={TrendingUp} isPositive={false} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

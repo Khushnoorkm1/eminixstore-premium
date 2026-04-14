@@ -19,6 +19,7 @@ import Account from './pages/Account';
 import Contact from './pages/Contact';
 import About from './pages/About';
 import FAQ from './pages/FAQ';
+import Blog from './pages/Blog';
 import { ShippingPolicy, ReturnPolicy, PrivacyPolicy, Terms } from './pages/Policies';
 import AdminRoutes from './pages/AdminRoutes';
 import ScrollToTop from './components/ScrollToTop';
@@ -58,6 +59,7 @@ function AppContent() {
           <Route path="/wishlist" element={<Wishlist />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/about" element={<About />} />
+          <Route path="/blog" element={<Blog />} />
           <Route path="/faq" element={<FAQ />} />
           <Route path="/shipping" element={<ShippingPolicy />} />
           <Route path="/returns" element={<ReturnPolicy />} />

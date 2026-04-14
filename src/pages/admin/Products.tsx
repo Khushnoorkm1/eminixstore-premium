@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Plus, 
   Search, 
@@ -12,9 +12,10 @@ import {
   Download,
   Upload,
   Star,
-  X
+  X,
+  Loader2
 } from 'lucide-react';
-import { SAMPLE_PRODUCTS } from '../../data/products';
+import { adminService } from '../../services/adminService';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   DndContext,
@@ -118,12 +119,31 @@ function SortableImage({ image, onRemove, onSetPrimary }: {
 }
 
 export default function AdminProducts() {
+  const [products, setProducts] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [editingProduct, setEditingProduct] = useState<any>(null);
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    setIsLoading(true);
+    try {
+      const data = await adminService.getProducts();
+      setProducts(data || []);
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Form State
   const [formData, setFormData] = useState({
@@ -277,29 +297,62 @@ export default function AdminProducts() {
 
     setIsSubmitting(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      console.log('Saving Product:', formData);
+      const productData = {
+        ...formData,
+        price: parseFloat(formData.price),
+        salePrice: formData.salePrice ? parseFloat(formData.salePrice) : null,
+        stock: parseInt(formData.stock),
+        // Use the primary image URL as the main product image
+        image: formData.images.find(img => img.isPrimary)?.url || (formData.images.length > 0 ? formData.images[0].url : '')
+      };
+
+      if (editingProduct) {
+        await adminService.updateProduct(editingProduct.id, productData);
+      } else {
+        await adminService.addProduct(productData);
+      }
+      
+      await fetchProducts();
       setIsAddModalOpen(false);
-      // Reset form
-      setFormData({
-        name: '',
-        description: '',
-        price: '',
-        salePrice: '',
-        stock: '',
-        sku: '',
-        category: 'Apparel',
-        images: [],
-        variants: []
-      });
-      alert('Product saved successfully!');
+      resetForm();
     } catch (error) {
       console.error('Error saving product:', error);
       alert('Failed to save product. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const resetForm = () => {
+    setFormData({
+      name: '',
+      description: '',
+      price: '',
+      salePrice: '',
+      stock: '',
+      sku: '',
+      category: 'Apparel',
+      images: [],
+      variants: []
+    });
+    setEditingProduct(null);
+    setErrors({});
+  };
+
+  const handleEditProduct = (product: any) => {
+    setEditingProduct(product);
+    setFormData({
+      name: product.name || '',
+      description: product.description || '',
+      price: product.price?.toString() || '',
+      salePrice: product.salePrice?.toString() || '',
+      stock: product.stock?.toString() || '',
+      sku: product.sku || '',
+      category: product.category || 'Apparel',
+      images: product.images || (product.image ? [{ id: '1', url: product.image, isPrimary: true }] : []),
+      variants: product.variants || []
+    });
+    setIsAddModalOpen(true);
   };
 
   const toggleSelectAll = () => {
@@ -319,12 +372,12 @@ export default function AdminProducts() {
   const handleBulkDelete = async () => {
     setIsSubmitting(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      console.log('Deleting Products:', selectedProductIds);
+      for (const id of selectedProductIds) {
+        await adminService.deleteProduct(id);
+      }
+      await fetchProducts();
       setSelectedProductIds([]);
       setIsDeleteModalOpen(false);
-      alert('Products deleted successfully!');
     } catch (error) {
       console.error('Error deleting products:', error);
       alert('Failed to delete products.');
@@ -333,7 +386,7 @@ export default function AdminProducts() {
     }
   };
 
-  const filteredProducts = SAMPLE_PRODUCTS.filter(p => 
+  const filteredProducts = products.filter(p => 
     p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     p.category.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -417,7 +470,15 @@ export default function AdminProducts() {
       </div>
 
       {/* Products Table */}
-      <div className="bg-white dark:bg-gray-900 rounded-[2.5rem] border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
+      <div className="bg-white dark:bg-gray-900 rounded-[2.5rem] border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden min-h-[400px] relative">
+        {isLoading ? (
+          <div className="absolute inset-0 flex items-center justify-center bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm z-10">
+            <div className="flex flex-col items-center space-y-4">
+              <Loader2 className="h-10 w-10 text-teal-800 animate-spin" />
+              <p className="text-sm font-bold text-gray-500 uppercase tracking-widest">Loading Inventory...</p>
+            </div>
+          </div>
+        ) : null}
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>
@@ -463,11 +524,11 @@ export default function AdminProducts() {
                       {product.category}
                     </span>
                   </td>
-                  <td className="px-8 py-4 text-sm font-bold text-teal-800 dark:text-teal-400">${product.price.toFixed(2)}</td>
+                  <td className="px-8 py-4 text-sm font-bold text-teal-800 dark:text-teal-400">${typeof product.price === 'number' ? product.price.toFixed(2) : product.price}</td>
                   <td className="px-8 py-4">
                     <div className="flex items-center space-x-2">
-                      <div className={`h-1.5 w-1.5 rounded-full ${product.rating > 4 ? 'bg-green-500' : 'bg-gold-500'}`}></div>
-                      <span className="text-sm text-gray-600 dark:text-gray-400 font-light">42 in stock</span>
+                      <div className={`h-1.5 w-1.5 rounded-full ${product.stock > 10 ? 'bg-green-500' : 'bg-gold-500'}`}></div>
+                      <span className="text-sm text-gray-600 dark:text-gray-400 font-light">{product.stock || 0} in stock</span>
                     </div>
                   </td>
                   <td className="px-8 py-4">
@@ -477,10 +538,19 @@ export default function AdminProducts() {
                   </td>
                   <td className="px-8 py-4">
                     <div className="flex items-center space-x-2">
-                      <button className="p-2 text-gray-400 hover:text-teal-800 dark:hover:text-teal-400 transition-colors">
+                      <button 
+                        onClick={() => handleEditProduct(product)}
+                        className="p-2 text-gray-400 hover:text-teal-800 dark:hover:text-teal-400 transition-colors"
+                      >
                         <Edit className="h-4 w-4" />
                       </button>
-                      <button className="p-2 text-gray-400 hover:text-red-600 transition-colors">
+                      <button 
+                        onClick={() => {
+                          setSelectedProductIds([product.id]);
+                          setIsDeleteModalOpen(true);
+                        }}
+                        className="p-2 text-gray-400 hover:text-red-600 transition-colors"
+                      >
                         <Trash2 className="h-4 w-4" />
                       </button>
                     </div>
@@ -573,8 +643,10 @@ export default function AdminProducts() {
               className="relative bg-white dark:bg-gray-900 w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
             >
               <div className="p-8 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">Add New Product</h3>
-                <button onClick={() => setIsAddModalOpen(false)} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-all">
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">
+                  {editingProduct ? 'Edit Product' : 'Add New Product'}
+                </h3>
+                <button onClick={() => { setIsAddModalOpen(false); setEditingProduct(null); }} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-all">
                   <X className="h-6 w-6 text-gray-400" />
                 </button>
               </div>

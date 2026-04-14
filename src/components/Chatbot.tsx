@@ -54,10 +54,16 @@ export default function Chatbot() {
             initial={{ scale: 0, rotate: -45 }}
             animate={{ scale: 1, rotate: 0 }}
             exit={{ scale: 0, rotate: 45 }}
+            whileHover={{ scale: 1.1 }}
             onClick={() => setIsOpen(true)}
-            className="bg-teal-800 text-white p-4 rounded-full shadow-2xl hover:bg-teal-900 transition-all group"
+            className="bg-[#006D5B] text-[#D4AF37] p-4 rounded-full shadow-[0_10px_40px_rgba(0,109,91,0.3)] border border-[#D4AF37]/30 transition-all group relative"
           >
-            <MessageCircle className="h-6 w-6 group-hover:scale-110 transition-transform" />
+            <motion.div
+              animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.4, 0.2] }}
+              transition={{ duration: 3, repeat: Infinity }}
+              className="absolute inset-0 bg-[#D4AF37] rounded-full"
+            />
+            <Bot className="h-6 w-6 group-hover:scale-110 transition-transform relative z-10" />
           </motion.button>
         )}
       </AnimatePresence>

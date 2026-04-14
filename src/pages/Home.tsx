@@ -6,6 +6,7 @@ import SEO from '../components/SEO';
 import { SAMPLE_PRODUCTS } from '../data/products';
 import { Truck, ShieldCheck, RotateCcw, Headphones, ArrowRight, Zap, Clock, Star, Sparkles, Gift, Crown } from 'lucide-react';
 import { motion, useScroll, useTransform } from 'motion/react';
+import { useTranslation } from 'react-i18next';
 
 const CATEGORIES = [
   { name: 'Apparel', image: 'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=800&q=80', count: 120, label: 'Haute Couture', gridClass: 'md:col-span-2 md:row-span-2' },
@@ -15,10 +16,39 @@ const CATEGORIES = [
 ];
 
 export default function Home() {
+  const { t } = useTranslation();
   const featuredProducts = SAMPLE_PRODUCTS.filter(p => p.isFeatured).slice(0, 4);
   const trendingProducts = SAMPLE_PRODUCTS.slice(0, 4);
-  const flashDeals = SAMPLE_PRODUCTS.slice(4, 8);
+  const newArrivals = SAMPLE_PRODUCTS.slice(4, 8);
+  const flashDeals = SAMPLE_PRODUCTS.slice(8, 12);
   const recommendedProducts = SAMPLE_PRODUCTS.slice(2, 6);
+
+  const REVIEWS = [
+    {
+      id: 1,
+      name: "Sarah Jenkins",
+      role: "Fashion Stylist",
+      content: "The quality of the signature series is simply unmatched. Eminixstore has become my go-to for premium essentials that actually last.",
+      rating: 5,
+      avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&q=80"
+    },
+    {
+      id: 2,
+      name: "Michael Chen",
+      role: "Tech Executive",
+      content: "Exceptional service and curated selection. The attention to detail in their packaging and delivery is what sets them apart.",
+      rating: 5,
+      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=80"
+    },
+    {
+      id: 3,
+      name: "Elena Rodriguez",
+      role: "Interior Designer",
+      content: "I love the minimalist aesthetic. Every piece I've ordered feels like a work of art. Truly timeless elegance.",
+      rating: 5,
+      avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&q=80"
+    }
+  ];
 
   const { scrollYProgress } = useScroll();
   const scale = useTransform(scrollYProgress, [0, 0.2], [1, 1.05]);
@@ -50,36 +80,12 @@ export default function Home() {
         <Hero />
       </motion.div>
 
-      {/* Trust Badges Section */}
-      <section className="py-16 border-b border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900/20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {[
-              { icon: Truck, title: 'Global Concierge', desc: 'Complimentary shipping on all orders' },
-              { icon: ShieldCheck, title: 'Secure Checkout', desc: 'Encrypted premium transactions' },
-              { icon: RotateCcw, title: 'Timeless Guarantee', desc: '30-day returns for peace of mind' },
-              { icon: Headphones, title: 'Elite Support', desc: '24/7 dedicated personal concierge' },
-            ].map((feature, i) => (
-              <div key={i} className="flex items-center space-x-4 p-6 rounded-2xl transition-all group">
-                <div className="bg-teal-800/10 dark:bg-teal-900/30 p-3 rounded-xl group-hover:bg-gold-500/20 transition-colors">
-                  <feature.icon className="h-6 w-6 text-teal-800 dark:text-teal-400 group-hover:text-gold-500 transition-colors" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-gray-900 dark:text-white text-sm uppercase tracking-wider">{feature.title}</h3>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">{feature.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Categories Section */}
+      {/* Featured Categories */}
       <section className="py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-end mb-12">
             <div>
-              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Curated Collections</h2>
+              <h2 className="text-3xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4 tracking-tight">Featured <span className="text-gold-500">Collections</span></h2>
               <p className="text-gray-500 dark:text-gray-400 font-light">Explore our handpicked selection of masterpieces</p>
             </div>
             <Link to="/shop" className="text-teal-800 dark:text-teal-400 font-bold flex items-center space-x-2 hover:text-gold-500 transition-colors">
@@ -107,6 +113,48 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Best Sellers */}
+      <section className="py-24 bg-white dark:bg-gray-900/20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-end mb-12">
+            <div>
+              <h2 className="text-3xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4 tracking-tight">Best <span className="text-gold-500">Sellers</span></h2>
+              <p className="text-gray-500 dark:text-gray-400 font-light">Our most coveted pieces, loved by the community</p>
+            </div>
+            <Link to="/shop?sort=popular" className="text-teal-800 dark:text-teal-400 font-bold flex items-center space-x-2 hover:text-gold-500 transition-colors">
+              <span className="text-sm uppercase tracking-widest">Explore All</span>
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {trendingProducts.map(product => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* New Arrivals */}
+      <section className="py-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-end mb-12">
+            <div>
+              <h2 className="text-3xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4 tracking-tight">New <span className="text-gold-500">Arrivals</span></h2>
+              <p className="text-gray-500 dark:text-gray-400 font-light">Freshly curated masterpieces just for you</p>
+            </div>
+            <Link to="/shop?sort=newest" className="text-teal-800 dark:text-teal-400 font-bold flex items-center space-x-2 hover:text-gold-500 transition-colors">
+              <span className="text-sm uppercase tracking-widest">View Latest</span>
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {newArrivals.map(product => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Flash Deals Section */}
       <section className="py-24 bg-white dark:bg-gray-900/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -116,7 +164,7 @@ export default function Home() {
                 <Zap className="h-6 w-6 text-gold-500 fill-current" />
               </div>
               <div>
-                <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Limited Drops</h2>
+                <h2 className="text-3xl md:text-5xl font-bold text-gray-900 dark:text-white tracking-tight">Flash <span className="text-gold-500">Deals</span></h2>
                 <p className="text-gray-500 dark:text-gray-400 font-light">Exclusive pieces at exceptional values</p>
               </div>
             </div>
@@ -149,6 +197,32 @@ export default function Home() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {flashDeals.map(product => (
               <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Why Choose Eminixstore (Trust Cards) */}
+      <section className="py-24 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4 tracking-tight">Why <span className="text-gold-500">Eminixstore</span>?</h2>
+            <p className="text-gray-500 dark:text-gray-400 font-light max-w-2xl mx-auto">Commitment to quality, security, and your satisfaction.</p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {[
+              { icon: Truck, title: 'Global Concierge', desc: 'Complimentary shipping on all orders worldwide' },
+              { icon: ShieldCheck, title: 'Secure Checkout', desc: 'Encrypted premium transactions for your safety' },
+              { icon: RotateCcw, title: 'Timeless Guarantee', desc: '30-day returns for peace of mind and trust' },
+              { icon: Headphones, title: 'Elite Support', desc: '24/7 dedicated personal concierge service' },
+            ].map((feature, i) => (
+              <div key={i} className="bg-white dark:bg-gray-800 p-8 rounded-[2.5rem] shadow-xl shadow-gray-200/30 dark:shadow-none border border-gray-100 dark:border-gray-700 group hover:border-gold-500/50 transition-all">
+                <div className="bg-teal-800/10 dark:bg-teal-900/30 w-16 h-16 flex items-center justify-center rounded-2xl mb-6 group-hover:bg-gold-500/20 transition-colors">
+                  <feature.icon className="h-8 w-8 text-teal-800 dark:text-teal-400 group-hover:text-gold-500 transition-colors" />
+                </div>
+                <h3 className="font-bold text-gray-900 dark:text-white text-lg mb-2">{feature.title}</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">{feature.desc}</p>
+              </div>
             ))}
           </div>
         </div>
@@ -215,6 +289,132 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Subscribe & Save Section */}
+      <section className="py-24 bg-white dark:bg-gray-900/40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4 tracking-tight">{t('sections.subscribe')}</h2>
+            <p className="text-gray-500 dark:text-gray-400 font-light max-w-2xl mx-auto">Luxury delivered to your doorstep on your schedule.</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              { 
+                name: 'The Essentialist', 
+                price: '₹2,999', 
+                period: 'Monthly', 
+                features: ['2 Premium Essentials', 'Free Shipping', '10% Member Discount'],
+                popular: false
+              },
+              { 
+                name: 'The Connoisseur', 
+                price: '₹7,499', 
+                period: 'Quarterly', 
+                features: ['5 Curated Masterpieces', 'Priority Concierge', '15% Member Discount', 'Exclusive Drops'],
+                popular: true
+              },
+              { 
+                name: 'The Collector', 
+                price: '₹24,999', 
+                period: 'Annually', 
+                features: ['12 Signature Pieces', 'Personal Stylist', '25% Member Discount', 'VIP Event Access'],
+                popular: false
+              }
+            ].map((plan, i) => (
+              <motion.div 
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className={`p-10 rounded-[3rem] border ${plan.popular ? 'border-gold-500 bg-teal-900 text-white shadow-2xl shadow-gold-500/10' : 'border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white'} relative overflow-hidden group`}
+              >
+                {plan.popular && (
+                  <div className="absolute top-6 right-6 bg-gold-500 text-teal-900 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">
+                    Most Popular
+                  </div>
+                )}
+                <h3 className={`text-2xl font-bold mb-2 ${plan.popular ? 'text-white' : 'text-gray-900 dark:text-white'}`}>{plan.name}</h3>
+                <div className="flex items-baseline space-x-1 mb-8">
+                  <span className="text-4xl font-bold tracking-tighter">{plan.price}</span>
+                  <span className={`text-sm font-light ${plan.popular ? 'text-gray-400' : 'text-gray-500'}`}>/{plan.period}</span>
+                </div>
+                <ul className="space-y-4 mb-10">
+                  {plan.features.map((feature, j) => (
+                    <li key={j} className="flex items-center space-x-3 text-sm font-light">
+                      <ShieldCheck className={`h-4 w-4 ${plan.popular ? 'text-gold-500' : 'text-teal-800 dark:text-teal-400'}`} />
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+                <button className={`w-full py-4 rounded-2xl font-bold transition-all ${plan.popular ? 'bg-gold-500 text-teal-900 hover:bg-gold-400' : 'bg-teal-800 text-white hover:bg-teal-900'}`}>
+                  Subscribe Now
+                </button>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Style Guide / Blog Section */}
+      <section className="py-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-end mb-12">
+            <div>
+              <h2 className="text-3xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4 tracking-tight">{t('sections.blog')}</h2>
+              <p className="text-gray-500 dark:text-gray-400 font-light">Insights into the world of luxury and timeless style</p>
+            </div>
+            <Link to="/blog" className="text-teal-800 dark:text-teal-400 font-bold flex items-center space-x-2 hover:text-gold-500 transition-colors">
+              <span className="text-sm uppercase tracking-widest">Read Journal</span>
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              {
+                title: "The Art of Minimalist Living",
+                excerpt: "Discover how to curate a home that reflects your inner peace and sophisticated taste.",
+                image: "https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85?w=800&q=80",
+                category: "Lifestyle",
+                readTime: "5 min read"
+              },
+              {
+                title: "Mastering the Capsule Wardrobe",
+                excerpt: "A guide to building a timeless collection of essentials that never go out of style.",
+                image: "https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=800&q=80",
+                category: "Fashion",
+                readTime: "8 min read"
+              },
+              {
+                title: "Tech Meets Elegance",
+                excerpt: "How modern innovations are being integrated into luxury design seamlessly.",
+                image: "https://images.unsplash.com/photo-1498049794561-7780e7231661?w=800&q=80",
+                category: "Innovation",
+                readTime: "6 min read"
+              }
+            ].map((post, i) => (
+              <Link key={i} to="/blog" className="group">
+                <div className="aspect-[4/3] rounded-[2.5rem] overflow-hidden mb-6 relative">
+                  <img 
+                    src={post.image} 
+                    alt={post.title} 
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    referrerPolicy="no-referrer"
+                  />
+                  <div className="absolute top-6 left-6 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md px-4 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest text-teal-800 dark:text-teal-400">
+                    {post.category}
+                  </div>
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-gold-500 transition-colors tracking-tight">{post.title}</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 font-light mb-4 line-clamp-2">{post.excerpt}</p>
+                <div className="flex items-center text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                  <Clock className="h-3 w-3 mr-2" />
+                  {post.readTime}
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Promo Banner */}
       <section className="py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -256,22 +456,36 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Trending Products */}
-      <section className="py-24">
+      {/* Newsletter */}
+      <section className="py-24 bg-gray-50 dark:bg-gray-900/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-end mb-12">
-            <div>
-              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Trending Now</h2>
-              <p className="text-gray-500 dark:text-gray-400 font-light">What the world is talking about</p>
-            </div>
-            <Link to="/shop" className="text-teal-800 dark:text-teal-400 font-bold flex items-center space-x-2 hover:text-gold-500 transition-colors">
-              <span className="text-sm uppercase tracking-widest">Explore All</span>
-              <ArrowRight className="h-4 w-4" />
-            </Link>
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4 tracking-tight">Voices of <span className="text-gold-500">Excellence</span></h2>
+            <p className="text-gray-500 dark:text-gray-400 font-light max-w-2xl mx-auto">Hear from our global community of connoisseurs who have experienced the Eminix standard.</p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {trendingProducts.map(product => (
-              <ProductCard key={product.id} product={product} />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {REVIEWS.map((review) => (
+              <motion.div 
+                key={review.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="bg-white dark:bg-gray-800 p-8 rounded-[2.5rem] shadow-xl shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-gray-700 relative"
+              >
+                <div className="flex items-center space-x-1 mb-6">
+                  {[...Array(review.rating)].map((_, i) => (
+                    <Star key={i} className="h-4 w-4 text-gold-500 fill-current" />
+                  ))}
+                </div>
+                <p className="text-gray-600 dark:text-gray-300 italic mb-8 leading-relaxed">"{review.content}"</p>
+                <div className="flex items-center space-x-4">
+                  <img src={review.avatar} alt={review.name} className="h-12 w-12 rounded-full object-cover border-2 border-gold-500/20" />
+                  <div>
+                    <h4 className="font-bold text-gray-900 dark:text-white text-sm">{review.name}</h4>
+                    <p className="text-xs text-gold-500 font-medium uppercase tracking-wider">{review.role}</p>
+                  </div>
+                </div>
+              </motion.div>
             ))}
           </div>
         </div>

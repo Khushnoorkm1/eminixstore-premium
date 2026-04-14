@@ -27,6 +27,7 @@ import { useTheme } from '../context/ThemeContext';
 import { loginWithGoogle, logout } from '../lib/firebase';
 import { motion, AnimatePresence } from 'motion/react';
 import { SAMPLE_PRODUCTS } from '../data/products';
+import { useTranslation } from 'react-i18next';
 
 // Announcement Bar Component
 function AnnouncementBar() {
@@ -145,17 +146,24 @@ export default function Navbar() {
   const { items } = useCart();
   const { wishlist } = useWishlist();
   const { theme, toggleTheme } = useTheme();
+  const { t, i18n } = useTranslation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [suggestions, setSuggestions] = useState<{ type: 'product' | 'category', value: string, id?: string }[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [language, setLanguage] = useState('EN');
   const [isLangOpen, setIsLangOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
   const navigate = useNavigate();
   const searchRef = useRef<HTMLDivElement>(null);
+
+  const currentLanguage = i18n.language.toUpperCase().slice(0, 2);
+
+  const changeLanguage = (lng: string) => {
+    i18n.changeLanguage(lng);
+    setIsLangOpen(false);
+  };
 
   const cartCount = items.reduce((sum, item) => sum + item.quantity, 0);
   const wishlistCount = wishlist.length;
@@ -311,7 +319,7 @@ export default function Navbar() {
                   className="flex items-center space-x-1 p-2.5 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-all text-xs font-bold"
                 >
                   <Globe className="h-4 w-4" />
-                  <span>{language}</span>
+                  <span>{currentLanguage}</span>
                 </button>
                 <AnimatePresence>
                   {isLangOpen && (
@@ -322,13 +330,13 @@ export default function Navbar() {
                       className="absolute right-0 mt-2 w-24 bg-white dark:bg-gray-900 rounded-xl shadow-xl border border-gray-100 dark:border-gray-800 py-2 z-50"
                     >
                       <button 
-                        onClick={() => { setLanguage('EN'); setIsLangOpen(false); }}
+                        onClick={() => changeLanguage('en')}
                         className="w-full text-left px-4 py-2 text-xs font-bold hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors dark:text-white"
                       >
                         English
                       </button>
                       <button 
-                        onClick={() => { setLanguage('HI'); setIsLangOpen(false); }}
+                        onClick={() => changeLanguage('hi')}
                         className="w-full text-left px-4 py-2 text-xs font-bold hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors dark:text-white"
                       >
                         हिन्दी
@@ -417,14 +425,14 @@ export default function Navbar() {
 
           {/* Navigation Menu (Desktop) */}
           <div className="hidden md:flex items-center justify-center space-x-10 h-10 border-t border-gray-50 dark:border-gray-900/50">
-            <Link to="/" className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-600 dark:text-gray-400 hover:text-gold-500 transition-colors">Home</Link>
+            <Link to="/" className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-600 dark:text-gray-400 hover:text-gold-500 transition-colors">{t('nav.home')}</Link>
             <div 
               className="h-full flex items-center"
               onMouseEnter={() => setIsMegaMenuOpen(true)}
               onMouseLeave={() => setIsMegaMenuOpen(false)}
             >
               <button className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-600 dark:text-gray-400 hover:text-gold-500 transition-colors flex items-center h-full">
-                Collections
+                {t('nav.collections')}
                 <ChevronDown className={`ml-1 h-3 w-3 transition-transform ${isMegaMenuOpen ? 'rotate-180' : ''}`} />
               </button>
               <MegaMenu 
@@ -432,13 +440,13 @@ export default function Navbar() {
                 onClose={() => setIsMegaMenuOpen(false)} 
               />
             </div>
-            <Link to="/shop" className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-600 dark:text-gray-400 hover:text-gold-500 transition-colors">Shop</Link>
+            <Link to="/shop" className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-600 dark:text-gray-400 hover:text-gold-500 transition-colors">{t('nav.shop')}</Link>
             <Link to="/shop?sort=sale" className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-600 dark:text-gray-400 hover:text-gold-500 transition-colors flex items-center">
               <Percent className="h-3 w-3 mr-1 text-red-500" />
               Deals
             </Link>
-            <Link to="/shop?sort=newest" className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-600 dark:text-gray-400 hover:text-gold-500 transition-colors">New Arrivals</Link>
-            <Link to="/about" className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-600 dark:text-gray-400 hover:text-gold-500 transition-colors">About</Link>
+            <Link to="/blog" className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-600 dark:text-gray-400 hover:text-gold-500 transition-colors">{t('nav.blog')}</Link>
+            <Link to="/about" className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-600 dark:text-gray-400 hover:text-gold-500 transition-colors">{t('nav.about')}</Link>
           </div>
         </div>
       </nav>
@@ -509,8 +517,8 @@ export default function Navbar() {
                   <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-2xl">
                     <span className="text-sm font-bold text-gray-900 dark:text-white">Language</span>
                     <div className="flex space-x-2">
-                      <button onClick={() => setLanguage('EN')} className={`px-3 py-1 rounded-lg text-[10px] font-bold ${language === 'EN' ? 'bg-teal-800 text-white' : 'bg-white dark:bg-gray-800 text-gray-500'}`}>EN</button>
-                      <button onClick={() => setLanguage('HI')} className={`px-3 py-1 rounded-lg text-[10px] font-bold ${language === 'HI' ? 'bg-teal-800 text-white' : 'bg-white dark:bg-gray-800 text-gray-500'}`}>HI</button>
+                      <button onClick={() => changeLanguage('en')} className={`px-3 py-1 rounded-lg text-[10px] font-bold ${i18n.language === 'en' ? 'bg-teal-800 text-white' : 'bg-white dark:bg-gray-800 text-gray-500'}`}>EN</button>
+                      <button onClick={() => changeLanguage('hi')} className={`px-3 py-1 rounded-lg text-[10px] font-bold ${i18n.language === 'hi' ? 'bg-teal-800 text-white' : 'bg-white dark:bg-gray-800 text-gray-500'}`}>HI</button>
                     </div>
                   </div>
                 </div>
