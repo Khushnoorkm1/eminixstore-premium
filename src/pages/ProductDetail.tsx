@@ -179,7 +179,7 @@ export default function ProductDetail() {
               <div className="flex items-center space-x-4">
                 <div className="flex items-center text-gold-500">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} className={`h-4 w-4 ${i < Math.floor(Number(averageRating)) ? 'fill-current' : 'text-gray-200 dark:text-gray-700'}`} />
+                    <Star key={i} className={`h-4 w-4 ${i < Math.floor(Number(averageRating)) ? 'fill-current' : 'text-gray-300 dark:text-gray-600'}`} />
                   ))}
                   <span className="text-sm font-bold text-gray-900 dark:text-white ml-2">{averageRating}</span>
                 </div>
@@ -395,7 +395,7 @@ export default function ProductDetail() {
                               <h4 className="font-bold text-gray-900 dark:text-white">{review.userName}</h4>
                               <div className="flex items-center text-gold-500 mt-1">
                                 {[...Array(5)].map((_, i) => (
-                                  <Star key={i} className={`h-3 w-3 ${i < review.rating ? 'fill-current' : 'text-gray-200 dark:text-gray-700'}`} />
+                                  <Star key={i} className={`h-3 w-3 ${i < review.rating ? 'fill-current' : 'text-gray-300 dark:text-gray-600'}`} />
                                 ))}
                               </div>
                             </div>

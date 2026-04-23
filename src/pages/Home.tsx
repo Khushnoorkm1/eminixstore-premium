@@ -7,6 +7,7 @@ import { SAMPLE_PRODUCTS } from '../data/products';
 import { Truck, ShieldCheck, RotateCcw, Headphones, ArrowRight, Zap, Clock, Star, Sparkles, Gift, Crown } from 'lucide-react';
 import { motion, useScroll, useTransform } from 'motion/react';
 import { useTranslation } from 'react-i18next';
+import { BLOG_POSTS } from '../data/blog';
 
 const CATEGORIES = [
   { name: 'Apparel', image: 'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=800&q=80', count: 120, label: 'Haute Couture', gridClass: 'md:col-span-2 md:row-span-2' },
@@ -368,30 +369,8 @@ export default function Home() {
             </Link>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              {
-                title: "The Art of Minimalist Living",
-                excerpt: "Discover how to curate a home that reflects your inner peace and sophisticated taste.",
-                image: "https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85?w=800&q=80",
-                category: "Lifestyle",
-                readTime: "5 min read"
-              },
-              {
-                title: "Mastering the Capsule Wardrobe",
-                excerpt: "A guide to building a timeless collection of essentials that never go out of style.",
-                image: "https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=800&q=80",
-                category: "Fashion",
-                readTime: "8 min read"
-              },
-              {
-                title: "Tech Meets Elegance",
-                excerpt: "How modern innovations are being integrated into luxury design seamlessly.",
-                image: "https://images.unsplash.com/photo-1498049794561-7780e7231661?w=800&q=80",
-                category: "Innovation",
-                readTime: "6 min read"
-              }
-            ].map((post, i) => (
-              <Link key={i} to="/blog" className="group">
+            {BLOG_POSTS.slice(0, 3).map((post, i) => (
+              <Link key={i} to={`/blog/${post.id}`} className="group">
                 <div className="aspect-[4/3] rounded-[2.5rem] overflow-hidden mb-6 relative">
                   <img 
                     src={post.image} 

@@ -83,9 +83,16 @@ export default function ProductCard({ product }: ProductCardProps) {
         <div className="p-5">
           <div className="flex justify-between items-start mb-2">
             <p className="text-[10px] font-bold text-teal-800 dark:text-teal-400 uppercase tracking-[0.2em]">{product.category}</p>
-            <div className="flex items-center text-gold-500">
-              <Star className="h-3 w-3 fill-current" />
-              <span className="text-[10px] font-bold text-gray-600 dark:text-gray-400 ml-1">{product.rating}</span>
+            <div className="flex items-center">
+              <div className="flex items-center mr-1.5">
+                {[...Array(5)].map((_, i) => (
+                  <Star 
+                    key={i} 
+                    className={`h-2.5 w-2.5 ${i < Math.floor(product.rating) ? 'text-gold-500 fill-current' : 'text-gray-300 dark:text-gray-600'}`} 
+                  />
+                ))}
+              </div>
+              <span className="text-[10px] font-bold text-gray-600 dark:text-gray-400">{product.rating}</span>
             </div>
           </div>
           
@@ -156,7 +163,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                   <div className="flex items-center space-x-4">
                     <div className="flex items-center text-gold-500">
                       {[...Array(5)].map((_, i) => (
-                        <Star key={i} className={`h-4 w-4 ${i < Math.floor(product.rating) ? 'fill-current' : 'text-gray-200 dark:text-gray-700'}`} />
+                        <Star key={i} className={`h-4 w-4 ${i < Math.floor(product.rating) ? 'fill-current' : 'text-gray-300 dark:text-gray-600'}`} />
                       ))}
                     </div>
                     <span className="text-sm text-gray-500 dark:text-gray-400 font-medium">{product.reviewsCount} Reviews</span>

@@ -1,57 +1,18 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Clock, User, ArrowRight, Search, Tag } from 'lucide-react';
+import { Clock, User, ArrowRight, Search } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import SEO from '../components/SEO';
-
-const BLOG_POSTS = [
-  {
-    id: 1,
-    title: "The Art of Minimalist Living",
-    excerpt: "Discover how to curate a home that reflects your inner peace and sophisticated taste. We explore the principles of minimalism and how they can be applied to modern interior design.",
-    image: "https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85?w=1200&q=80",
-    category: "Lifestyle",
-    author: "Elena Rodriguez",
-    date: "April 10, 2026",
-    readTime: "5 min read"
-  },
-  {
-    id: 2,
-    title: "Mastering the Capsule Wardrobe",
-    excerpt: "A guide to building a timeless collection of essentials that never go out of style. Learn how to select pieces that are versatile, high-quality, and uniquely you.",
-    image: "https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=1200&q=80",
-    category: "Fashion",
-    author: "Sarah Jenkins",
-    date: "April 08, 2026",
-    readTime: "8 min read"
-  },
-  {
-    id: 3,
-    title: "Tech Meets Elegance",
-    excerpt: "How modern innovations are being integrated into luxury design seamlessly. We look at the latest smart home gadgets that don't compromise on aesthetic appeal.",
-    image: "https://images.unsplash.com/photo-1498049794561-7780e7231661?w=1200&q=80",
-    category: "Innovation",
-    author: "Michael Chen",
-    date: "April 05, 2026",
-    readTime: "6 min read"
-  },
-  {
-    id: 4,
-    title: "The Future of Sustainable Luxury",
-    excerpt: "Exploring how premium brands are embracing eco-friendly practices without losing their exclusive appeal.",
-    image: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=1200&q=80",
-    category: "Sustainability",
-    author: "David Atten",
-    date: "April 02, 2026",
-    readTime: "10 min read"
-  }
-];
+import { BLOG_POSTS } from '../data/blog';
+import { useTranslation } from 'react-i18next';
 
 export default function Blog() {
+  const { t } = useTranslation();
+  
   return (
     <div className="bg-[#FAF9F6] dark:bg-gray-950 min-h-screen pt-24 pb-24 transition-colors">
       <SEO 
-        title="Journal | Eminixstore" 
+        title={`${t('nav.blog')} | Eminixstore`} 
         description="Insights into the world of luxury, timeless style, and modern innovations."
       />
 
@@ -63,7 +24,7 @@ export default function Blog() {
             animate={{ opacity: 1, y: 0 }}
             className="text-gold-500 font-bold uppercase tracking-[0.4em] text-xs mb-4"
           >
-            Eminix Journal
+            {t('sections.blog')}
           </motion.p>
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
@@ -114,7 +75,7 @@ export default function Blog() {
             <p className="text-gray-300 font-light mb-8 line-clamp-2 text-lg">
               {BLOG_POSTS[0].excerpt}
             </p>
-            <Link to="#" className="inline-flex items-center space-x-2 text-gold-500 font-bold uppercase tracking-widest text-sm hover:text-white transition-colors">
+            <Link to={`/blog/${BLOG_POSTS[0].id}`} className="inline-flex items-center space-x-2 text-gold-500 font-bold uppercase tracking-widest text-sm hover:text-white transition-colors">
               <span>Read Full Article</span>
               <ArrowRight className="h-4 w-4" />
             </Link>
@@ -177,7 +138,7 @@ export default function Blog() {
                 <p className="text-gray-500 dark:text-gray-400 font-light line-clamp-3 leading-relaxed">
                   {post.excerpt}
                 </p>
-                <Link to="#" className="inline-flex items-center space-x-2 text-teal-800 dark:text-teal-400 font-bold uppercase tracking-widest text-xs group-hover:text-gold-500 transition-colors">
+                <Link to={`/blog/${post.id}`} className="inline-flex items-center space-x-2 text-teal-800 dark:text-teal-400 font-bold uppercase tracking-widest text-xs group-hover:text-gold-500 transition-colors">
                   <span>Read More</span>
                   <ArrowRight className="h-3 w-3" />
                 </Link>
